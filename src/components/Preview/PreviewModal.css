@@ -1,0 +1,141 @@
+.preview-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.preview-modal {
+  width: 90%;
+  max-width: 1200px;
+  height: 90%;
+  background: #1f2937;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background: #111827;
+  border-bottom: 1px solid #374151;
+}
+
+.preview-title {
+  margin: 0;
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.preview-close-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: #374151;
+  color: white;
+  font-size: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.preview-close-btn:hover {
+  background: #4b5563;
+}
+
+.preview-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px 20px;
+  overflow: hidden;
+}
+
+.preview-nav-btn {
+  width: 50px;
+  height: 50px;
+  border: none;
+  background: #374151;
+  color: white;
+  font-size: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-nav-btn:hover:not(:disabled) {
+  background: #4b5563;
+  transform: scale(1.1);
+}
+
+.preview-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.preview-slide-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 100%;
+}
+
+.preview-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background: #111827;
+  border-top: 1px solid #374151;
+}
+
+.preview-counter {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.preview-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.preview-controls button {
+  padding: 8px 20px;
+  border: 1px solid #374151;
+  background: #1f2937;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.preview-controls button:hover:not(:disabled) {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+.preview-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

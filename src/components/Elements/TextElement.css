@@ -1,0 +1,40 @@
+.text-element {
+  width: 100%;
+  height: 100%;
+  padding: 4px 8px;
+  cursor: text;
+  overflow: visible;
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+.text-element:not(.editing) {
+  cursor: move;
+}
+
+.text-element.editing {
+  outline: 2px solid #3b82f6;
+  background: rgba(255, 255, 255, 0.95);
+  cursor: text;
+  overflow: auto;
+}
+
+.text-element:focus {
+  outline: none;
+}
+
+/* List styles */
+.text-element-list {
+  overflow: visible;
+}
+
+.text-element-list ul,
+.text-element-list ol {
+  margin: 0;
+  padding: 0;
+  list-style-position: inside;
+}
+
+.text-element-list li {
+  display: list-item;
+}

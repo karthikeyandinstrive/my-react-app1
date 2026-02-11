@@ -1,0 +1,19 @@
+.shape-element {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.shape-rectangle {
+  border-radius: 4px;
+}
+
+.shape-circle {
+  border-radius: 50%;
+}
+
+.shape-line {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}

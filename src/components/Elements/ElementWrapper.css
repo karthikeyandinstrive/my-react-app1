@@ -1,0 +1,82 @@
+.element-wrapper {
+  position: absolute;
+  cursor: move;
+  user-select: none;
+}
+
+.element-wrapper.selected {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+
+.element-wrapper.dragging {
+  opacity: 0.8;
+}
+
+.element-resize-handle {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  background: #3b82f6;
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: nwse-resize;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.element-delete-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+
+  width: 20px;
+  height: 20px;
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+
+  padding: 0;
+
+  background: #ffffff;
+  color: #6b7280;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  display: grid;
+  place-items: center;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+  opacity: 0;
+  pointer-events: none;
+
+  transform: translateZ(0); /* fixes sub-pixel distortion */
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.element-wrapper:hover .element-delete-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.element-delete-btn:hover {
+  color: #111827;
+  transform: scale(1.05);
+}
+
+.element-delete-btn:active {
+  transform: scale(0.95);
+}
+
