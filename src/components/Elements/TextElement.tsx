@@ -7,9 +7,10 @@ import './TextElement.css';
 interface TextElementProps {
   element: TextElementType;
   isSelected: boolean;
+  onContextMenu?: (e: React.MouseEvent) => void;
 }
 
-function TextElement({ element, isSelected }: TextElementProps) {
+function TextElement({ element, isSelected, onContextMenu }: TextElementProps) {
   const { actions } = usePresentation();
   const [isEditing, setIsEditing] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -316,7 +317,7 @@ function TextElement({ element, isSelected }: TextElementProps) {
   };
 
   return (
-    <ElementWrapper element={element} isSelected={isSelected}>
+    <ElementWrapper element={element} isSelected={isSelected} onContextMenu={onContextMenu}>
       {renderContent()}
     </ElementWrapper>
   );

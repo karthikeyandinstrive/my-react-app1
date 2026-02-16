@@ -7,9 +7,10 @@ interface ElementWrapperProps {
   element: SlideElement;
   isSelected: boolean;
   children: ReactNode;
+  onContextMenu?: (e: React.MouseEvent) => void;
 }
 
-function ElementWrapper({ element, isSelected, children }: ElementWrapperProps) {
+function ElementWrapper({ element, isSelected, children, onContextMenu }: ElementWrapperProps) {
   const { actions } = usePresentation();
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -150,6 +151,7 @@ function ElementWrapper({ element, isSelected, children }: ElementWrapperProps) 
         zIndex: element.zIndex,
       }}
       onMouseDown={handleMouseDown}
+      onContextMenu={onContextMenu}
     >
       {children}
 

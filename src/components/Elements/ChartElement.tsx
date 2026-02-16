@@ -40,6 +40,7 @@ ChartJS.register(
 interface ChartElementProps {
   element: ChartElementType;
   isSelected: boolean;
+  onContextMenu?: (e: React.MouseEvent) => void;
 }
 
 // Default colors for charts
@@ -56,7 +57,7 @@ const hexToRgba = (hex: string, alpha: number): string => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-function ChartElement({ element, isSelected }: ChartElementProps) {
+function ChartElement({ element, isSelected, onContextMenu }: ChartElementProps) {
   const { actions } = usePresentation();
   const [showEditor, setShowEditor] = useState(false);
 
@@ -221,7 +222,7 @@ function ChartElement({ element, isSelected }: ChartElementProps) {
 
   return (
     <>
-      <ElementWrapper element={element} isSelected={isSelected}>
+      <ElementWrapper element={element} isSelected={isSelected} onContextMenu={onContextMenu}>
         <div className="chart-element" onDoubleClick={handleEditChart}>
           {element.showTitle && element.title && (
             <div className="chart-title">{element.title}</div>

@@ -7,9 +7,10 @@ import './ImageElement.css';
 interface ImageElementProps {
   element: ImageElementType;
   isSelected: boolean;
+  onContextMenu?: (e: React.MouseEvent) => void;
 }
 
-function ImageElement({ element, isSelected }: ImageElementProps) {
+function ImageElement({ element, isSelected, onContextMenu }: ImageElementProps) {
   const { actions } = usePresentation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -35,7 +36,7 @@ function ImageElement({ element, isSelected }: ImageElementProps) {
   };
 
   return (
-    <ElementWrapper element={element} isSelected={isSelected}>
+    <ElementWrapper element={element} isSelected={isSelected} onContextMenu={onContextMenu}>
       <div className="image-element">
         <img src={element.src} alt={element.alt} className="image-element-img" />
 

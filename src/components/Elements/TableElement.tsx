@@ -8,9 +8,10 @@ import './TableElement.css';
 interface TableElementProps {
   element: TableElementType;
   isSelected: boolean;
+  onContextMenu?: (e: React.MouseEvent) => void;
 }
 
-function TableElement({ element, isSelected }: TableElementProps) {
+function TableElement({ element, isSelected, onContextMenu }: TableElementProps) {
   const { actions } = usePresentation();
   const [editingCell, setEditingCell] = useState<{ row: number; col: number } | null>(null);
   const [showEditor, setShowEditor] = useState(false);
@@ -55,7 +56,7 @@ function TableElement({ element, isSelected }: TableElementProps) {
 
   return (
     <>
-      <ElementWrapper element={element} isSelected={isSelected}>
+      <ElementWrapper element={element} isSelected={isSelected} onContextMenu={onContextMenu}>
         <div className="table-element" onDoubleClick={handleEditTable}>
         <table
           className="table-content"

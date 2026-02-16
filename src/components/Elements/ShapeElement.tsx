@@ -6,9 +6,10 @@ import './ShapeElement.css';
 interface ShapeElementProps {
   element: ShapeElementType;
   isSelected: boolean;
+  onContextMenu?: (e: React.MouseEvent) => void;
 }
 
-function ShapeElement({ element, isSelected }: ShapeElementProps) {
+function ShapeElement({ element, isSelected, onContextMenu }: ShapeElementProps) {
   const { actions: _actions } = usePresentation();
 
   const renderShape = () => {
@@ -58,7 +59,7 @@ function ShapeElement({ element, isSelected }: ShapeElementProps) {
   };
 
   return (
-    <ElementWrapper element={element} isSelected={isSelected}>
+    <ElementWrapper element={element} isSelected={isSelected} onContextMenu={onContextMenu}>
       <div className="shape-element">{renderShape()}</div>
     </ElementWrapper>
   );

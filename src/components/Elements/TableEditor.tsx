@@ -96,16 +96,16 @@ function TableEditor({ element, onSave, onClose }: TableEditorProps) {
             <div className="control-group">
               <label>Rows: {rows}</label>
               <div className="control-buttons">
-                <button onClick={handleAddRow} className="control-btn">+ Add Row</button>
-                <button onClick={handleRemoveRow} className="control-btn" disabled={rows <= 1}>- Remove Row</button>
+                <button onClick={handleAddRow} className="control-btn control-btn-add">+ Add Row</button>
+                <button onClick={handleRemoveRow} className="control-btn control-btn-remove" disabled={rows <= 1}>- Remove Row</button>
               </div>
             </div>
 
             <div className="control-group">
               <label>Columns: {cols}</label>
               <div className="control-buttons">
-                <button onClick={handleAddColumn} className="control-btn">+ Add Column</button>
-                <button onClick={handleRemoveColumn} className="control-btn" disabled={cols <= 1}>- Remove Column</button>
+                <button onClick={handleAddColumn} className="control-btn control-btn-add">+ Add Column</button>
+                <button onClick={handleRemoveColumn} className="control-btn control-btn-remove" disabled={cols <= 1}>- Remove Column</button>
               </div>
             </div>
           </div>
@@ -141,7 +141,6 @@ function TableEditor({ element, onSave, onClose }: TableEditorProps) {
                           type="text"
                           value={cell.text}
                           onChange={(e) => handleCellChange(rowIdx, colIdx, 'text', e.target.value)}
-                          placeholder={`R${rowIdx + 1}C${colIdx + 1}`}
                           className="cell-editor-input"
                         />
                       </td>
