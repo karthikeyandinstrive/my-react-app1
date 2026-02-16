@@ -16,6 +16,7 @@ function ElementWrapper({ element, isSelected, children }: ElementWrapperProps) 
   const elementRef = useRef<HTMLDivElement>(null);
   const dragStartPos = useRef({ x: 0, y: 0, elemX: 0, elemY: 0 });
   const resizeStartPos = useRef({ x: 0, y: 0, width: 0, height: 0 });
+  const lastElementState = useRef<SlideElement | null>(null); // Store final state for commit
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0) return; // Only left click
@@ -81,7 +82,9 @@ function ElementWrapper({ element, isSelected, children }: ElementWrapperProps) 
         },
       };
 
-      actions.updateElement(updatedElement);
+      // Use silent update during drag (no history recording)
+      actions.updateElementSilent(updatedElement);
+      lastElementState.current = updatedElement;
     } else if (isResizing) {
       const deltaX = e.clientX - resizeStartPos.current.x;
       const deltaY = e.clientY - resizeStartPos.current.y;
@@ -101,11 +104,18 @@ function ElementWrapper({ element, isSelected, children }: ElementWrapperProps) 
         },
       };
 
-      actions.updateElement(updatedElement);
+      // Use silent update during resize (no history recording)
+      actions.updateElementSilent(updatedElement);
+      lastElementState.current = updatedElement;
     }
   };
 
   const handleMouseUp = () => {
+    // Commit the final position to history when drag/resize ends
+    if ((isDragging || isResizing) && lastElementState.current) {
+      actions.commitElementUpdate(lastElementState.current);
+      lastElementState.current = null;
+    }
     setIsDragging(false);
     setIsResizing(false);
   };

@@ -1,6 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { usePresentation } from '../../context/PresentationContext';
+import { useHistory } from '../../context/HistoryContext';
 import { generateAndDownloadPPTX } from '../../services/pptxGenerator';
+import HistoryPanel from './HistoryPanel';
 import './HeaderBar.css';
 
 interface HeaderBarProps {
@@ -13,10 +15,59 @@ interface HeaderBarProps {
 
 function HeaderBar({ zoom, onZoomChange, theme, onThemeChange, onOpenTemplateGallery }: HeaderBarProps) {
   const { state, actions } = usePresentation();
+  const { state: historyState, canUndo, canRedo, undo, redo } = useHistory();
   const [isDownloading, setIsDownloading] = useState(false);
   const [showJsonModal, setShowJsonModal] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showHistoryPanel, setShowHistoryPanel] = useState(false);
   const importInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle undo action
+  const handleUndo = () => {
+    if (!canUndo) return;
+    const entry = historyState.entries[historyState.currentIndex - 1];
+    if (entry && entry.presentationSnapshot) {
+      actions.restoreFromHistory(
+        entry.presentationSnapshot,
+        entry.currentSlideIndex,
+        entry.selectedElementId
+      );
+      undo();
+    }
+  };
+
+  // Handle redo action
+  const handleRedo = () => {
+    if (!canRedo) return;
+    const entry = historyState.entries[historyState.currentIndex + 1];
+    if (entry && entry.presentationSnapshot) {
+      actions.restoreFromHistory(
+        entry.presentationSnapshot,
+        entry.currentSlideIndex,
+        entry.selectedElementId
+      );
+      redo();
+    }
+  };
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check for Ctrl/Cmd + Z (undo) or Ctrl/Cmd + Y (redo) or Ctrl/Cmd + Shift + Z (redo)
+      if ((e.ctrlKey || e.metaKey) && !e.altKey) {
+        if (e.key === 'z' && !e.shiftKey) {
+          e.preventDefault();
+          handleUndo();
+        } else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) {
+          e.preventDefault();
+          handleRedo();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [canUndo, canRedo, historyState.currentIndex, historyState.entries]);
 
   const handleDownload = async () => {
     if (!state.presentation) return;
@@ -111,16 +162,47 @@ function HeaderBar({ zoom, onZoomChange, theme, onThemeChange, onOpenTemplateGal
         </div>
 
         <div className="header-center">
-          <button className="header-btn icon-btn" title="Undo">
+          <button
+            className="header-btn icon-btn"
+            title="Undo (Ctrl+Z)"
+            onClick={handleUndo}
+            disabled={!canUndo}
+          >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M3 10h10c4.418 0 8 3.582 8 8v0M3 10l6-6M3 10l6 6"/>
             </svg>
           </button>
-          <button className="header-btn icon-btn" title="Redo">
+          <button
+            className="header-btn icon-btn"
+            title="Redo (Ctrl+Y)"
+            onClick={handleRedo}
+            disabled={!canRedo}
+          >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 10H11C6.582 10 3 13.582 3 18v0M21 10l-6-6M21 10l-6 6"/>
             </svg>
           </button>
+
+          {/* History Panel Button */}
+          <div className="header-menu-wrapper">
+            <button
+              className={`header-btn history-btn ${showHistoryPanel ? 'active' : ''} ${historyState.entries.length > 0 ? 'has-entries' : ''}`}
+              title="View edit history"
+              onClick={() => setShowHistoryPanel(!showHistoryPanel)}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              {historyState.entries.length > 0 && (
+                <span className="history-count">{historyState.entries.length}</span>
+              )}
+            </button>
+            <HistoryPanel
+              isOpen={showHistoryPanel}
+              onClose={() => setShowHistoryPanel(false)}
+            />
+          </div>
 
           <div className="header-separator" />
 

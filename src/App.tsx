@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { PresentationProvider, usePresentation } from './context/PresentationContext';
+import { HistoryProvider } from './context/HistoryContext';
+import HistoryIntegration from './components/HistoryIntegration';
 import AppLayout from './components/Layout/AppLayout';
 import AiContentDemo from './components/AiContent/AiContentDemo';
 import './App.css';
@@ -48,9 +50,12 @@ function AppContent() {
 
 function App() {
   return (
-    <PresentationProvider>
-      <AppContent />
-    </PresentationProvider>
+    <HistoryProvider>
+      <PresentationProvider>
+        <HistoryIntegration />
+        <AppContent />
+      </PresentationProvider>
+    </HistoryProvider>
   );
 }
 

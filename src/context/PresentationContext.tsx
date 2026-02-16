@@ -1,8 +1,9 @@
-import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, useRef, useCallback, type ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { PresentationState, Presentation, Slide, SlideElement } from '../types/presentation';
 import { apiService } from '../services/api';
 import { DEFAULT_SLIDE_WIDTH, DEFAULT_SLIDE_HEIGHT, DEFAULT_SLIDE_BACKGROUND } from '../utils/constants';
+import { TRACKED_ACTIONS } from '../types/history';
 
 type Action =
   | { type: 'SET_PRESENTATION'; payload: Presentation }
@@ -25,7 +26,17 @@ type Action =
   | { type: 'PASTE_ELEMENT' }
   | { type: 'SET_PREVIEW_MODE'; payload: boolean }
   | { type: 'SET_SAVING'; payload: boolean }
-  | { type: 'SET_LAST_SAVED'; payload: string };
+  | { type: 'SET_LAST_SAVED'; payload: string }
+  | { type: 'RESTORE_FROM_HISTORY'; payload: { presentation: Presentation; currentSlideIndex: number; selectedElementId: string | null } };
+
+// Type for history recording callback
+type HistoryRecorder = (
+  actionType: string,
+  presentation: Presentation | null,
+  currentSlideIndex: number,
+  selectedElementId: string | null,
+  payload?: unknown
+) => void;
 
 interface PresentationContextType {
   state: PresentationState;
@@ -42,6 +53,8 @@ interface PresentationContextType {
     setCurrentSlide: (index: number) => void;
     addElement: (element: SlideElement) => void;
     updateElement: (element: SlideElement) => void;
+    updateElementSilent: (element: SlideElement) => void; // Update without recording history (for dragging)
+    commitElementUpdate: (element: SlideElement) => void; // Commit final position to history
     deleteElement: (id: string) => void;
     moveElementForward: (id: string) => void;
     moveElementBackward: (id: string) => void;
@@ -51,7 +64,9 @@ interface PresentationContextType {
     togglePreview: () => void;
     loadPresentation: (presentation: Presentation) => void;
     savePresentation: () => Promise<void>;
+    restoreFromHistory: (presentation: Presentation, currentSlideIndex: number, selectedElementId: string | null) => void;
   };
+  setHistoryRecorder: (recorder: HistoryRecorder | null) => void;
 }
 
 const PresentationContext = createContext<PresentationContextType | undefined>(undefined);
@@ -481,6 +496,16 @@ function presentationReducer(state: PresentationState, action: Action): Presenta
         lastSaved: action.payload,
       };
 
+    case 'RESTORE_FROM_HISTORY': {
+      const { presentation, currentSlideIndex, selectedElementId } = action.payload;
+      return {
+        ...state,
+        presentation,
+        currentSlideIndex,
+        selectedElementId,
+      };
+    }
+
     default:
       return state;
   }
@@ -488,6 +513,34 @@ function presentationReducer(state: PresentationState, action: Action): Presenta
 
 export function PresentationProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(presentationReducer, initialState);
+  const historyRecorderRef = useRef<HistoryRecorder | null>(null);
+
+  // Function to set the history recorder (called by HistoryIntegration)
+  const setHistoryRecorder = useCallback((recorder: HistoryRecorder | null) => {
+    historyRecorderRef.current = recorder;
+  }, []);
+
+  // Helper to dispatch and record history
+  const dispatchWithHistory = useCallback((action: Action, payload?: unknown) => {
+    dispatch(action);
+
+    // Record to history if it's a tracked action
+    if (TRACKED_ACTIONS.includes(action.type as typeof TRACKED_ACTIONS[number]) && historyRecorderRef.current) {
+      // We need to get the new state after dispatch, but useReducer is synchronous
+      // So we use a microtask to ensure the state has updated
+      queueMicrotask(() => {
+        // The state here is stale, so we compute what the new state would be
+        const newState = presentationReducer(state, action);
+        historyRecorderRef.current?.(
+          action.type,
+          newState.presentation,
+          newState.currentSlideIndex,
+          newState.selectedElementId,
+          payload
+        );
+      });
+    }
+  }, [state]);
 
   // Auto-save effect
   useEffect(() => {
@@ -513,79 +566,89 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
 
   const actions = {
     createNewPresentation: (title: string) => {
-      dispatch({ type: 'CREATE_NEW_PRESENTATION', payload: title });
+      dispatchWithHistory({ type: 'CREATE_NEW_PRESENTATION', payload: title }, title);
     },
 
     createPresentationWithSlides: (title: string, slides: Slide[]) => {
-      dispatch({ type: 'CREATE_PRESENTATION_WITH_SLIDES', payload: { title, slides } });
+      dispatchWithHistory({ type: 'CREATE_PRESENTATION_WITH_SLIDES', payload: { title, slides } }, { title, slides });
     },
 
     addSlide: () => {
-      dispatch({ type: 'ADD_SLIDE' });
+      dispatchWithHistory({ type: 'ADD_SLIDE' });
     },
 
     addSlideWithTemplate: (elements: SlideElement[], background: string, masterName: string) => {
-      dispatch({ type: 'ADD_SLIDE_WITH_TEMPLATE', payload: { elements, background, masterName } });
+      dispatchWithHistory({ type: 'ADD_SLIDE_WITH_TEMPLATE', payload: { elements, background, masterName } }, { masterName });
     },
 
     duplicateSlide: (id: string) => {
-      dispatch({ type: 'DUPLICATE_SLIDE', payload: id });
+      dispatchWithHistory({ type: 'DUPLICATE_SLIDE', payload: id }, id);
     },
 
     deleteSlide: (id: string) => {
-      dispatch({ type: 'DELETE_SLIDE', payload: id });
+      dispatchWithHistory({ type: 'DELETE_SLIDE', payload: id }, id);
     },
 
     updateSlide: (slide: Slide) => {
-      dispatch({ type: 'UPDATE_SLIDE', payload: slide });
+      dispatchWithHistory({ type: 'UPDATE_SLIDE', payload: slide }, slide);
     },
 
     reorderSlides: (slides: Slide[]) => {
-      dispatch({ type: 'REORDER_SLIDES', payload: slides });
+      dispatchWithHistory({ type: 'REORDER_SLIDES', payload: slides });
     },
 
     setCurrentSlide: (index: number) => {
-      dispatch({ type: 'SET_CURRENT_SLIDE', payload: index });
+      dispatch({ type: 'SET_CURRENT_SLIDE', payload: index }); // Not tracked in history
     },
 
     addElement: (element: SlideElement) => {
-      dispatch({ type: 'ADD_ELEMENT', payload: element });
+      dispatchWithHistory({ type: 'ADD_ELEMENT', payload: element }, element);
     },
 
     updateElement: (element: SlideElement) => {
+      dispatchWithHistory({ type: 'UPDATE_ELEMENT', payload: element }, element);
+    },
+
+    // Silent update - doesn't record history (use for continuous updates like dragging)
+    updateElementSilent: (element: SlideElement) => {
       dispatch({ type: 'UPDATE_ELEMENT', payload: element });
     },
 
+    // Commit update - records to history (use when drag ends)
+    commitElementUpdate: (element: SlideElement) => {
+      dispatchWithHistory({ type: 'UPDATE_ELEMENT', payload: element }, element);
+    },
+
     deleteElement: (id: string) => {
-      dispatch({ type: 'DELETE_ELEMENT', payload: id });
+      dispatchWithHistory({ type: 'DELETE_ELEMENT', payload: id }, id);
     },
 
     moveElementForward: (id: string) => {
-      dispatch({ type: 'MOVE_ELEMENT_FORWARD', payload: id });
+      dispatchWithHistory({ type: 'MOVE_ELEMENT_FORWARD', payload: id }, id);
     },
 
     moveElementBackward: (id: string) => {
-      dispatch({ type: 'MOVE_ELEMENT_BACKWARD', payload: id });
+      dispatchWithHistory({ type: 'MOVE_ELEMENT_BACKWARD', payload: id }, id);
     },
 
     selectElement: (id: string | null) => {
-      dispatch({ type: 'SELECT_ELEMENT', payload: id });
+      dispatch({ type: 'SELECT_ELEMENT', payload: id }); // Not tracked in history
     },
 
     copyElement: (id: string) => {
-      dispatch({ type: 'COPY_ELEMENT', payload: id });
+      dispatch({ type: 'COPY_ELEMENT', payload: id }); // Not tracked in history
     },
 
     pasteElement: () => {
-      dispatch({ type: 'PASTE_ELEMENT' });
+      dispatchWithHistory({ type: 'PASTE_ELEMENT' });
     },
 
     togglePreview: () => {
-      dispatch({ type: 'SET_PREVIEW_MODE', payload: !state.isPreviewMode });
+      dispatch({ type: 'SET_PREVIEW_MODE', payload: !state.isPreviewMode }); // Not tracked
     },
 
     loadPresentation: (presentation: Presentation) => {
-      dispatch({ type: 'SET_PRESENTATION', payload: presentation });
+      dispatch({ type: 'SET_PRESENTATION', payload: presentation }); // Not tracked (initial load)
     },
 
     savePresentation: async () => {
@@ -612,10 +675,14 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
         dispatch({ type: 'SET_SAVING', payload: false });
       }
     },
+
+    restoreFromHistory: (presentation: Presentation, currentSlideIndex: number, selectedElementId: string | null) => {
+      dispatch({ type: 'RESTORE_FROM_HISTORY', payload: { presentation, currentSlideIndex, selectedElementId } });
+    },
   };
 
   return (
-    <PresentationContext.Provider value={{ state, dispatch, actions }}>
+    <PresentationContext.Provider value={{ state, dispatch, actions, setHistoryRecorder }}>
       {children}
     </PresentationContext.Provider>
   );
