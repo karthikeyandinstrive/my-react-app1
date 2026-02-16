@@ -7,6 +7,7 @@ import { DEFAULT_SLIDE_WIDTH, DEFAULT_SLIDE_HEIGHT, DEFAULT_SLIDE_BACKGROUND } f
 type Action =
   | { type: 'SET_PRESENTATION'; payload: Presentation }
   | { type: 'CREATE_NEW_PRESENTATION'; payload: string }
+  | { type: 'CREATE_PRESENTATION_WITH_SLIDES'; payload: { title: string; slides: Slide[] } }
   | { type: 'ADD_SLIDE' }
   | { type: 'ADD_SLIDE_WITH_TEMPLATE'; payload: { elements: SlideElement[]; background: string; masterName: string } }
   | { type: 'DUPLICATE_SLIDE'; payload: string }
@@ -31,6 +32,7 @@ interface PresentationContextType {
   dispatch: React.Dispatch<Action>;
   actions: {
     createNewPresentation: (title: string) => void;
+    createPresentationWithSlides: (title: string, slides: Slide[]) => void;
     addSlide: () => void;
     addSlideWithTemplate: (elements: SlideElement[], background: string, masterName: string) => void;
     duplicateSlide: (id: string) => void;
@@ -99,6 +101,29 @@ function presentationReducer(state: PresentationState, action: Action): Presenta
         presentation: newPresentation,
         currentSlideIndex: 0,
       };
+
+    case 'CREATE_PRESENTATION_WITH_SLIDES': {
+      const { title, slides } = action.payload;
+
+      const presentation: Presentation = {
+        id: '',
+        title,
+        slides,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        metadata: {
+          slideWidth: DEFAULT_SLIDE_WIDTH,
+          slideHeight: DEFAULT_SLIDE_HEIGHT,
+        },
+      };
+
+      return {
+        ...state,
+        presentation,
+        currentSlideIndex: 0,
+        selectedElementId: null,
+      };
+    }
 
     case 'ADD_SLIDE': {
       if (!state.presentation) return state;
@@ -489,6 +514,10 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
   const actions = {
     createNewPresentation: (title: string) => {
       dispatch({ type: 'CREATE_NEW_PRESENTATION', payload: title });
+    },
+
+    createPresentationWithSlides: (title: string, slides: Slide[]) => {
+      dispatch({ type: 'CREATE_PRESENTATION_WITH_SLIDES', payload: { title, slides } });
     },
 
     addSlide: () => {

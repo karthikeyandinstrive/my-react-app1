@@ -123,7 +123,7 @@ const convertTemplateElement = (el: TemplateElement, zIndex: number): SlideEleme
 };
 
 // Convert template elements to slide elements for preview
-const createPreviewSlide = (layoutId: string): Slide => {
+const createPreviewSlide = (layoutId: string, background?: string): Slide => {
   const layoutElements = getSlideLayout(layoutId);
 
   const elements: SlideElement[] = layoutElements.map((el: TemplateElement, index: number) =>
@@ -134,7 +134,7 @@ const createPreviewSlide = (layoutId: string): Slide => {
     id: uuidv4(),
     order: 0,
     elements,
-    background: '#ffffff',
+    background: background || '#ffffff',
   };
 };
 
@@ -148,7 +148,10 @@ function TemplateGallery({ isOpen, onClose }: TemplateGalleryProps) {
     if (!selectedPack) return [];
     return selectedPack.slides.map(slideConfig => ({
       ...slideConfig,
-      preview: createPreviewSlide(slideConfig.layoutId),
+      preview: createPreviewSlide(
+        slideConfig.layoutId,
+        slideConfig.background || selectedPack.background
+      ),
     }));
   }, [selectedPack]);
 
@@ -172,27 +175,19 @@ function TemplateGallery({ isOpen, onClose }: TemplateGalleryProps) {
         convertTemplateElement(el, elIndex + 1)
       );
 
+      // Use slide-specific background, pack default background, or fallback to white
+      const background = slideConfig.background || selectedPack.background || '#ffffff';
+
       return {
         id: uuidv4(),
         order: index,
         elements,
-        background: '#ffffff',
+        background,
       };
     });
 
-    // Create new presentation with template slides
-    actions.createNewPresentation(selectedPack.name + ' Presentation');
-
-    // Replace the default slide with template slides
-    slides.forEach((slide, index) => {
-      if (index === 0) {
-        // Update first slide
-        actions.updateSlide(slide);
-      } else {
-        // Add additional slides
-        actions.addSlideWithTemplate(slide.elements, slide.background, '');
-      }
-    });
+    // Create new presentation with template slides directly
+    actions.createPresentationWithSlides(selectedPack.name + ' Presentation', slides);
 
     onClose();
   };
@@ -264,7 +259,9 @@ function TemplateGallery({ isOpen, onClose }: TemplateGalleryProps) {
               <div className="template-grid">
                 {(currentCategory?.packs || templatePacks).map(pack => {
                   const firstSlide = pack.slides[0];
-                  const previewSlide = firstSlide ? createPreviewSlide(firstSlide.layoutId) : null;
+                  const previewSlide = firstSlide
+                    ? createPreviewSlide(firstSlide.layoutId, firstSlide.background || pack.background)
+                    : null;
 
                   return (
                     <div

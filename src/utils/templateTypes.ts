@@ -76,9 +76,11 @@ export interface TemplatePack {
   name: string;
   description: string;
   thumbnail?: string;
+  background?: string; // Default background for all slides in the pack
   slides: {
     layoutId: string;
     name: string;
+    background?: string; // Override background for specific slide
   }[];
 }
 
