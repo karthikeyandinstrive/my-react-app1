@@ -28,6 +28,13 @@ function AppLayout() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Close left panel when right panel opens
+  useEffect(() => {
+    if (state.selectedElementId || state.isSlideSelected) {
+      setActiveTool(null);
+    }
+  }, [state.selectedElementId, state.isSlideSelected]);
+
   if (!state.presentation) {
     return <div className="app-loading">Loading...</div>;
   }
