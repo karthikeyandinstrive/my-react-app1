@@ -14,7 +14,11 @@ const chartTypes: { type: ChartType; icon: string; label: string }[] = [
   { type: 'radar', icon: '🕸', label: 'Radar Chart' },
 ];
 
-function ChartsPanel() {
+interface ChartsPanelProps {
+  onClose: () => void;
+}
+
+function ChartsPanel({ onClose }: ChartsPanelProps) {
   const { actions } = usePresentation();
 
   const handleAddChart = (chartType: ChartType) => {
@@ -38,7 +42,10 @@ function ChartsPanel() {
   return (
     <div className="left-panel">
       <div className="panel-header">
-        <h2 className="panel-title">Charts</h2>
+        <div className="panel-header-top">
+          <h2 className="panel-title">Charts</h2>
+          <button className="panel-close-btn" onClick={onClose}>×</button>
+        </div>
         <p className="panel-subtitle">Add data visualizations</p>
       </div>
 

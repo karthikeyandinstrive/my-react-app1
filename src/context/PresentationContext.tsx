@@ -22,6 +22,7 @@ type Action =
   | { type: 'MOVE_ELEMENT_FORWARD'; payload: string }
   | { type: 'MOVE_ELEMENT_BACKWARD'; payload: string }
   | { type: 'SELECT_ELEMENT'; payload: string | null }
+  | { type: 'SELECT_SLIDE' }
   | { type: 'COPY_ELEMENT'; payload: string }
   | { type: 'PASTE_ELEMENT' }
   | { type: 'SET_PREVIEW_MODE'; payload: boolean }
@@ -59,6 +60,7 @@ interface PresentationContextType {
     moveElementForward: (id: string) => void;
     moveElementBackward: (id: string) => void;
     selectElement: (id: string | null) => void;
+    selectSlide: () => void;
     copyElement: (id: string) => void;
     pasteElement: () => void;
     togglePreview: () => void;
@@ -75,6 +77,7 @@ const initialState: PresentationState = {
   presentation: null,
   currentSlideIndex: 0,
   selectedElementId: null,
+  isSlideSelected: false,
   isPreviewMode: false,
   isSaving: false,
   lastSaved: null,
@@ -425,6 +428,14 @@ function presentationReducer(state: PresentationState, action: Action): Presenta
       return {
         ...state,
         selectedElementId: action.payload,
+        isSlideSelected: action.payload === null ? state.isSlideSelected : false,
+      };
+
+    case 'SELECT_SLIDE':
+      return {
+        ...state,
+        selectedElementId: null,
+        isSlideSelected: true,
       };
 
     case 'COPY_ELEMENT': {
@@ -633,6 +644,10 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
 
     selectElement: (id: string | null) => {
       dispatch({ type: 'SELECT_ELEMENT', payload: id }); // Not tracked in history
+    },
+
+    selectSlide: () => {
+      dispatch({ type: 'SELECT_SLIDE' }); // Not tracked in history
     },
 
     copyElement: (id: string) => {

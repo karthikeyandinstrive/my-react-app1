@@ -15,7 +15,7 @@ export type ThemeType = 'dark' | 'light';
 
 function AppLayout() {
   const { state } = usePresentation();
-  const [activeTool, setActiveTool] = useState<ToolType>('text');
+  const [activeTool, setActiveTool] = useState<ToolType | null>('text');
   const [zoom, setZoom] = useState(100);
   const [theme, setTheme] = useState<ThemeType>(() => {
     const saved = localStorage.getItem('theme');
@@ -32,8 +32,23 @@ function AppLayout() {
     return <div className="app-loading">Loading...</div>;
   }
 
+  const handleCloseLeftPanel = () => {
+    setActiveTool(null);
+  };
+
+  const showLeftPanel = activeTool !== null;
+  const showRightPanel = state.selectedElementId !== null || state.isSlideSelected;
+
+  // Build layout classes
+  const layoutClasses = [
+    'app-layout',
+    theme,
+    !showLeftPanel ? 'no-left-panel' : '',
+    !showRightPanel ? 'no-right-panel' : '',
+  ].filter(Boolean).join(' ');
+
   return (
-    <div className={`app-layout ${theme}`}>
+    <div className={layoutClasses}>
       <HeaderBar
         zoom={zoom}
         onZoomChange={setZoom}
@@ -50,9 +65,11 @@ function AppLayout() {
         <IconToolbar activeTool={activeTool} onToolChange={setActiveTool} />
       </div>
 
-      <div className="left-panel-area">
-        <LeftPanel activeTool={activeTool} />
-      </div>
+      {activeTool && (
+        <div className="left-panel-area">
+          <LeftPanel activeTool={activeTool} onClose={handleCloseLeftPanel} />
+        </div>
+      )}
 
       <div className="canvas-area">
         <div className="canvas-container" style={{ transform: `scale(${zoom / 100})` }}>
@@ -60,9 +77,11 @@ function AppLayout() {
         </div>
       </div>
 
-      <div className="right-panel-area">
-        <RightPanel />
-      </div>
+      {showRightPanel && (
+        <div className="right-panel-area">
+          <RightPanel />
+        </div>
+      )}
 
       {state.isPreviewMode && <PreviewModal />}
 

@@ -3,7 +3,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { usePresentation } from '../../context/PresentationContext';
 import type { ImageElement } from '../../types/presentation';
 
-function ImagesPanel() {
+interface ImagesPanelProps {
+  onClose: () => void;
+}
+
+function ImagesPanel({ onClose }: ImagesPanelProps) {
   const { actions } = usePresentation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -47,7 +51,10 @@ function ImagesPanel() {
   return (
     <div className="left-panel">
       <div className="panel-header">
-        <h2 className="panel-title">Images</h2>
+        <div className="panel-header-top">
+          <h2 className="panel-title">Images</h2>
+          <button className="panel-close-btn" onClick={onClose}>×</button>
+        </div>
         <p className="panel-subtitle">Add images to your slide</p>
       </div>
 

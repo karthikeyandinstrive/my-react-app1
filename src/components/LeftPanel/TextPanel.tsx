@@ -5,7 +5,11 @@ import type { TextElement } from '../../types/presentation';
 import { DEFAULT_TEXT_ELEMENT } from '../../utils/constants';
 import { fontThemes, getDefaultTheme, getTextStylesFromTheme, type FontTheme } from '../../utils/fontThemes';
 
-function TextPanel() {
+interface TextPanelProps {
+  onClose: () => void;
+}
+
+function TextPanel({ onClose }: TextPanelProps) {
   const { actions } = usePresentation();
   const [selectedTheme, setSelectedTheme] = useState<FontTheme>(getDefaultTheme());
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -50,7 +54,10 @@ function TextPanel() {
   return (
     <div className="left-panel">
       <div className="panel-header">
-        <h2 className="panel-title">Text</h2>
+        <div className="panel-header-top">
+          <h2 className="panel-title">Text</h2>
+          <button className="panel-close-btn" onClick={onClose}>×</button>
+        </div>
         <p className="panel-subtitle">Add text elements to your slide</p>
       </div>
 

@@ -15,7 +15,11 @@ const colors = [
   '#06b6d4', '#3b82f6', '#1e1e1e', '#ffffff',
 ];
 
-function ShapesPanel() {
+interface ShapesPanelProps {
+  onClose: () => void;
+}
+
+function ShapesPanel({ onClose }: ShapesPanelProps) {
   const { actions } = usePresentation();
 
   const handleAddShape = (shapeType: 'rectangle' | 'circle' | 'line', color?: string) => {
@@ -34,7 +38,10 @@ function ShapesPanel() {
   return (
     <div className="left-panel">
       <div className="panel-header">
-        <h2 className="panel-title">Shapes</h2>
+        <div className="panel-header-top">
+          <h2 className="panel-title">Shapes</h2>
+          <button className="panel-close-btn" onClick={onClose}>×</button>
+        </div>
         <p className="panel-subtitle">Add shapes to your slide</p>
       </div>
 

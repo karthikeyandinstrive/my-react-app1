@@ -2,7 +2,7 @@ import type { ToolType } from '../Layout/AppLayout';
 import './IconToolbar.css';
 
 interface IconToolbarProps {
-  activeTool: ToolType;
+  activeTool: ToolType | null;
   onToolChange: (tool: ToolType) => void;
 }
 

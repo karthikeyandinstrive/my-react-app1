@@ -185,6 +185,7 @@ export interface PresentationState {
   presentation: Presentation | null;
   currentSlideIndex: number;
   selectedElementId: string | null;
+  isSlideSelected: boolean;
   isPreviewMode: boolean;
   isSaving: boolean;
   lastSaved: string | null;

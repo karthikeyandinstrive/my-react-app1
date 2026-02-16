@@ -4,7 +4,11 @@ import { usePresentation } from '../../context/PresentationContext';
 import { DEFAULT_TABLE_ELEMENT, DEFAULT_TABLE_CELL } from '../../utils/constants';
 import type { TableElement, TableCell } from '../../types/presentation';
 
-function TablesPanel() {
+interface TablesPanelProps {
+  onClose: () => void;
+}
+
+function TablesPanel({ onClose }: TablesPanelProps) {
   const { actions } = usePresentation();
   const [hoverCell, setHoverCell] = useState<{ row: number; col: number } | null>(null);
 
@@ -34,7 +38,10 @@ function TablesPanel() {
   return (
     <div className="left-panel">
       <div className="panel-header">
-        <h2 className="panel-title">Tables</h2>
+        <div className="panel-header-top">
+          <h2 className="panel-title">Tables</h2>
+          <button className="panel-close-btn" onClick={onClose}>×</button>
+        </div>
         <p className="panel-subtitle">Add tables to your slide</p>
       </div>
 

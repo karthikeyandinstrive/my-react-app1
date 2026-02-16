@@ -133,7 +133,7 @@ function SlidePanel() {
           <div
             key={slide.id}
             className={`slide-panel-item ${index === state.currentSlideIndex ? 'active' : ''}`}
-            onClick={() => actions.setCurrentSlide(index)}
+            onClick={() => { actions.setCurrentSlide(index); actions.selectSlide(); }}
             onContextMenu={(e) => handleContextMenu(e, slide.id, index)}
           >
             <div className="slide-panel-thumbnail">

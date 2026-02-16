@@ -136,3 +136,27 @@
     display: none;
   }
 }
+
+/* When left panel is hidden */
+.app-layout.no-left-panel {
+  grid-template-columns: 160px 48px 1fr 280px;
+  grid-template-areas:
+    "header header header header"
+    "slides icons  canvas right";
+}
+
+/* When right panel is hidden */
+.app-layout.no-right-panel {
+  grid-template-columns: 160px 48px 220px 1fr;
+  grid-template-areas:
+    "header header header header"
+    "slides icons  left   canvas";
+}
+
+/* When both panels are hidden */
+.app-layout.no-left-panel.no-right-panel {
+  grid-template-columns: 160px 48px 1fr;
+  grid-template-areas:
+    "header header header"
+    "slides icons  canvas";
+}
