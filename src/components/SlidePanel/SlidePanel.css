@@ -68,12 +68,14 @@
 .slide-panel-thumbnail {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
-  background-color: #fff;
   border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
+}
+
+.slide-panel-thumbnail .slide-preview-mini {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16 / 9;
 }
 
 .slide-panel-number {

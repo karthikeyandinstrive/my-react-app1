@@ -66,7 +66,7 @@ function SlideList() {
                 </button>
                 <button
                   onClick={(e) => moveSlideDown(index, e)}
-                  disabled={index === state.presentation.slides.length - 1}
+                  disabled={index === state.presentation!.slides.length - 1}
                   className="slide-reorder-btn"
                   title="Move slide down"
                 >

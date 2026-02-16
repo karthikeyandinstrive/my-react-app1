@@ -309,3 +309,38 @@
   height: 16px;
   accent-color: #6366f1;
 }
+
+/* Subsection for expanded settings */
+.settings-subsection {
+  margin-top: 8px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: var(--input-bg, #252540);
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #2d2d44);
+}
+
+.settings-subsection .settings-row {
+  margin-bottom: 8px;
+}
+
+.settings-subsection .settings-row:last-child {
+  margin-bottom: 0;
+}
+
+.settings-subsection .settings-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+
+.settings-subsection .settings-input {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.settings-subsection .settings-color-input {
+  width: 100%;
+  height: 28px;
+}

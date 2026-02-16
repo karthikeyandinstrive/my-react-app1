@@ -340,7 +340,7 @@ function SlidePreview({ slide }: SlidePreviewProps) {
                 }}>
                   <div>📊</div>
                   <div style={{ fontSize: '12px', marginTop: '8px', color: '#666' }}>
-                    {chartType.toUpperCase()}
+                    {String(chartType).toUpperCase()}
                   </div>
                 </div>
               );

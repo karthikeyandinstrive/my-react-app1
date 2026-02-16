@@ -240,7 +240,7 @@ export class PPTXGenerator {
         options: {
           fontSize: cell.fontSize || 12,
           color: cell.color?.replace('#', '') || '000000',
-          fill: cell.fillColor?.replace('#', '') || (rowIdx === 0 && element.headerRow ? 'F0F0F0' : 'FFFFFF'),
+          fill: { color: cell.fillColor?.replace('#', '') || (rowIdx === 0 && element.headerRow ? 'F0F0F0' : 'FFFFFF') },
           bold: cell.bold || (rowIdx === 0 && element.headerRow),
           italic: cell.italic,
           align: cell.align || 'left',
@@ -294,22 +294,22 @@ export class PPTXGenerator {
       chartOptions.valAxisTitle = 'Values';
     }
 
-    slide.addChart(chartType, chartData, chartOptions);
+    slide.addChart(chartType as pptxgen.CHART_NAME, chartData, chartOptions);
   }
 
-  private getChartType(chartType: string): pptxgen.ChartType {
-    const chartTypeMap: Record<string, pptxgen.ChartType> = {
-      bar: this.pres.ChartType.bar,
-      column: this.pres.ChartType.bar, // PptxGenJS uses 'bar' for both
-      line: this.pres.ChartType.line,
-      area: this.pres.ChartType.area,
-      pie: this.pres.ChartType.pie,
-      doughnut: this.pres.ChartType.doughnut,
-      scatter: this.pres.ChartType.scatter,
-      bubble: this.pres.ChartType.bubble,
-      radar: this.pres.ChartType.radar,
+  private getChartType(chartType: string): pptxgen.CHART_NAME {
+    const chartTypeMap: Record<string, pptxgen.CHART_NAME> = {
+      bar: this.pres.ChartType.bar as pptxgen.CHART_NAME,
+      column: this.pres.ChartType.bar as pptxgen.CHART_NAME,
+      line: this.pres.ChartType.line as pptxgen.CHART_NAME,
+      area: this.pres.ChartType.area as pptxgen.CHART_NAME,
+      pie: this.pres.ChartType.pie as pptxgen.CHART_NAME,
+      doughnut: this.pres.ChartType.doughnut as pptxgen.CHART_NAME,
+      scatter: this.pres.ChartType.scatter as pptxgen.CHART_NAME,
+      bubble: this.pres.ChartType.bubble as pptxgen.CHART_NAME,
+      radar: this.pres.ChartType.radar as pptxgen.CHART_NAME,
     };
-    return chartTypeMap[chartType] || this.pres.ChartType.bar;
+    return chartTypeMap[chartType] || (this.pres.ChartType.bar as pptxgen.CHART_NAME);
   }
 
   async download(fileName: string = 'presentation.pptx'): Promise<void> {

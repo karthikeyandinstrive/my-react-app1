@@ -1,4 +1,5 @@
 import { usePresentation } from '../../context/PresentationContext';
+import SlidePreviewMini from '../SlidePreview/SlidePreviewMini';
 import './SlidePanel.css';
 
 function SlidePanel() {
@@ -70,21 +71,9 @@ function SlidePanel() {
             className={`slide-panel-item ${index === state.currentSlideIndex ? 'active' : ''}`}
             onClick={() => actions.setCurrentSlide(index)}
           >
-            <div
-              className="slide-panel-thumbnail"
-              style={{
-                backgroundColor: slide.background?.startsWith('#') ? slide.background : '#fff',
-                backgroundImage: slide.background && !slide.background.startsWith('#')
-                  ? `url(${slide.background})`
-                  : 'none',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            >
+            <div className="slide-panel-thumbnail">
+              <SlidePreviewMini slide={slide} width={130} height={73} />
               <span className="slide-panel-number">{index + 1}</span>
-              {slide.elements.length > 0 && (
-                <span className="slide-panel-element-count">{slide.elements.length}</span>
-              )}
             </div>
 
             <div className="slide-panel-actions">

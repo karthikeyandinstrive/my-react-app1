@@ -7,6 +7,7 @@ import RightPanel from '../RightPanel/RightPanel';
 import SlidePanel from '../SlidePanel/SlidePanel';
 import SlideCanvas from '../SlideBuilder/SlideCanvas';
 import PreviewModal from '../Preview/PreviewModal';
+import TemplateGallery from '../TemplateGallery/TemplateGallery';
 import './AppLayout.css';
 
 export type ToolType = 'text' | 'shapes' | 'tables' | 'charts' | 'images';
@@ -20,6 +21,7 @@ function AppLayout() {
     const saved = localStorage.getItem('theme');
     return (saved as ThemeType) || 'dark';
   });
+  const [showTemplateGallery, setShowTemplateGallery] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -37,6 +39,7 @@ function AppLayout() {
         onZoomChange={setZoom}
         theme={theme}
         onThemeChange={setTheme}
+        onOpenTemplateGallery={() => setShowTemplateGallery(true)}
       />
 
       <div className="slide-panel-area">
@@ -62,6 +65,11 @@ function AppLayout() {
       </div>
 
       {state.isPreviewMode && <PreviewModal />}
+
+      <TemplateGallery
+        isOpen={showTemplateGallery}
+        onClose={() => setShowTemplateGallery(false)}
+      />
     </div>
   );
 }

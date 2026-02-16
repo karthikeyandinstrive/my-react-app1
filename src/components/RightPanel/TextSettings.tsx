@@ -219,6 +219,97 @@ function TextSettings({ element }: TextSettingsProps) {
         <div className="settings-section">
           <div className="settings-section-title">Effects</div>
 
+          {/* Text Outline */}
+          <div className="settings-toggle">
+            <span className="settings-toggle-label">Text Outline</span>
+            <div
+              className={`settings-toggle-switch ${element.outlineWidth && element.outlineWidth > 0 ? 'active' : ''}`}
+              onClick={() => {
+                if (element.outlineWidth && element.outlineWidth > 0) {
+                  updateElement({ outlineWidth: 0 });
+                } else {
+                  updateElement({
+                    outlineWidth: 2,
+                    outlineColor: '#000000'
+                  });
+                }
+              }}
+            />
+          </div>
+
+          {element.outlineWidth && element.outlineWidth > 0 && (
+            <div className="settings-subsection">
+              <div className="settings-row two-col">
+                <div>
+                  <label className="settings-label">Width</label>
+                  <input
+                    type="number"
+                    className="settings-input"
+                    value={element.outlineWidth || 2}
+                    min={1}
+                    max={10}
+                    onChange={(e) => updateElement({ outlineWidth: parseInt(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <label className="settings-label">Color</label>
+                  <input
+                    type="color"
+                    className="settings-color-input"
+                    value={element.outlineColor || '#000000'}
+                    onChange={(e) => updateElement({ outlineColor: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Text Glow */}
+          <div className="settings-toggle">
+            <span className="settings-toggle-label">Text Glow</span>
+            <div
+              className={`settings-toggle-switch ${element.glowSize && element.glowSize > 0 ? 'active' : ''}`}
+              onClick={() => {
+                if (element.glowSize && element.glowSize > 0) {
+                  updateElement({ glowSize: 0 });
+                } else {
+                  updateElement({
+                    glowSize: 10,
+                    glowColor: '#6366f1'
+                  });
+                }
+              }}
+            />
+          </div>
+
+          {element.glowSize && element.glowSize > 0 && (
+            <div className="settings-subsection">
+              <div className="settings-row two-col">
+                <div>
+                  <label className="settings-label">Size</label>
+                  <input
+                    type="number"
+                    className="settings-input"
+                    value={element.glowSize || 10}
+                    min={1}
+                    max={50}
+                    onChange={(e) => updateElement({ glowSize: parseInt(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <label className="settings-label">Color</label>
+                  <input
+                    type="color"
+                    className="settings-color-input"
+                    value={element.glowColor || '#6366f1'}
+                    onChange={(e) => updateElement({ glowColor: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Text Shadow */}
           <div className="settings-toggle">
             <span className="settings-toggle-label">Text Shadow</span>
             <div
@@ -237,6 +328,57 @@ function TextSettings({ element }: TextSettingsProps) {
               }}
             />
           </div>
+
+          {element.shadowBlur && element.shadowBlur > 0 && (
+            <div className="settings-subsection">
+              <div className="settings-row two-col">
+                <div>
+                  <label className="settings-label">Blur</label>
+                  <input
+                    type="number"
+                    className="settings-input"
+                    value={element.shadowBlur || 4}
+                    min={0}
+                    max={50}
+                    onChange={(e) => updateElement({ shadowBlur: parseInt(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <label className="settings-label">Color</label>
+                  <input
+                    type="color"
+                    className="settings-color-input"
+                    value={element.shadowColor || '#000000'}
+                    onChange={(e) => updateElement({ shadowColor: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="settings-row two-col">
+                <div>
+                  <label className="settings-label">Offset X</label>
+                  <input
+                    type="number"
+                    className="settings-input"
+                    value={element.shadowOffsetX || 0}
+                    min={-20}
+                    max={20}
+                    onChange={(e) => updateElement({ shadowOffsetX: parseInt(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <label className="settings-label">Offset Y</label>
+                  <input
+                    type="number"
+                    className="settings-input"
+                    value={element.shadowOffsetY || 0}
+                    min={-20}
+                    max={20}
+                    onChange={(e) => updateElement({ shadowOffsetY: parseInt(e.target.value) })}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>

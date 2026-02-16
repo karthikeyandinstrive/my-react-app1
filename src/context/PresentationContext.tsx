@@ -471,6 +471,7 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
     }
 
     const timeout = setTimeout(async () => {
+      if (!state.presentation) return;
       try {
         dispatch({ type: 'SET_SAVING', payload: true });
         await apiService.updatePresentation(state.presentation.id, state.presentation);

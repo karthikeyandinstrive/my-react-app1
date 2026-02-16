@@ -1,21 +1,30 @@
+import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { usePresentation } from '../../context/PresentationContext';
-import { DEFAULT_TEXT_ELEMENT } from '../../utils/constants';
 import type { TextElement } from '../../types/presentation';
-
-const textStyles = [
-  { name: 'Title', font: 'Inter', size: 48, weight: 700 },
-  { name: 'Subtitle', font: 'Inter', size: 32, weight: 500 },
-  { name: 'Heading Large', font: 'Inter', size: 36, weight: 600 },
-  { name: 'Heading Medium', font: 'Inter', size: 28, weight: 600 },
-  { name: 'Heading Small', font: 'Inter', size: 24, weight: 500 },
-  { name: 'Body Text', font: 'Inter', size: 20, weight: 400 },
-  { name: 'Quote', font: 'Inter', size: 24, weight: 400, italic: true },
-  { name: 'Caption', font: 'Inter', size: 16, weight: 400 },
-];
+import { DEFAULT_TEXT_ELEMENT } from '../../utils/constants';
+import { fontThemes, getDefaultTheme, getTextStylesFromTheme, type FontTheme } from '../../utils/fontThemes';
 
 function TextPanel() {
   const { actions } = usePresentation();
+  const [selectedTheme, setSelectedTheme] = useState<FontTheme>(getDefaultTheme());
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Get text styles from selected theme
+  const textStyles = getTextStylesFromTheme(selectedTheme);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleAddTextBox = (style?: typeof textStyles[0]) => {
     const newTextElement: TextElement = {
@@ -33,6 +42,11 @@ function TextPanel() {
     actions.addElement(newTextElement);
   };
 
+  const handleSelectTheme = (theme: FontTheme) => {
+    setSelectedTheme(theme);
+    setIsDropdownOpen(false);
+  };
+
   return (
     <div className="left-panel">
       <div className="panel-header">
@@ -46,12 +60,49 @@ function TextPanel() {
           Add Text Box
         </button>
 
-        <div className="panel-section" style={{ marginTop: 20 }}>
+        <div className="panel-section" style={{ marginTop: 20, marginRight:25 }}>
           <div className="panel-section-title">Font Theme</div>
-          <div className="panel-dropdown">
-            <span>Modern Clean <span style={{ color: '#6b7280', fontSize: 11 }}>(Minimal)</span></span>
-            <span className="panel-dropdown-arrow">▼</span>
+          <div className="panel-dropdown-container" ref={dropdownRef}>
+            <div
+              className={`panel-dropdown ${isDropdownOpen ? 'active' : ''}`}
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              <span>
+                {selectedTheme.name}{' '}
+                <span style={{ color: '#6b7280', fontSize: 11 }}>({selectedTheme.category})</span>
+              </span>
+              <span className={`panel-dropdown-arrow ${isDropdownOpen ? 'open' : ''}`}>▼</span>
+            </div>
+
+            {isDropdownOpen && (
+              <div className="panel-dropdown-menu">
+                {fontThemes.map((theme) => (
+                  <div
+                    key={theme.id}
+                    className={`panel-dropdown-item ${selectedTheme.id === theme.id ? 'active' : ''}`}
+                    onClick={() => handleSelectTheme(theme)}
+                  >
+                    <div className="dropdown-item-content">
+                      <span className="dropdown-item-name">{theme.name}</span>
+                      <span className="dropdown-item-category">{theme.category}</span>
+                    </div>
+                    <div className="dropdown-item-preview">
+                      <span style={{ fontFamily: theme.fonts.heading, fontWeight: 600, fontSize: 11 }}>
+                        Aa
+                      </span>
+                      <span style={{ fontFamily: theme.fonts.body, fontSize: 10, color: '#9ca3af' }}>
+                        {theme.fonts.heading === theme.fonts.body ? '' : ` / ${theme.fonts.body}`}
+                      </span>
+                    </div>
+                    {selectedTheme.id === theme.id && (
+                      <span className="dropdown-item-check">✓</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+          <p className="theme-description">{selectedTheme.description}</p>
         </div>
 
         <div className="panel-section">
@@ -67,6 +118,7 @@ function TextPanel() {
                 style={{
                   fontSize: Math.min(style.size * 0.5, 20),
                   fontWeight: style.weight,
+                  fontFamily: style.font,
                   fontStyle: style.italic ? 'italic' : 'normal',
                   color: style.name === 'Quote' ? '#6366f1' : undefined,
                 }}
