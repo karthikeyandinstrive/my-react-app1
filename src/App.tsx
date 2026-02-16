@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { PresentationProvider, usePresentation } from './context/PresentationContext';
-import SlideBuilder from './components/SlideBuilder/SlideBuilder';
+import AppLayout from './components/Layout/AppLayout';
 import AiContentDemo from './components/AiContent/AiContentDemo';
 import './App.css';
 
@@ -21,26 +21,26 @@ function AppContent() {
           onClick={() => setShowDemo(true)}
           style={{
             position: 'fixed',
-            bottom: 20,
+            bottom: 120,
             right: 20,
             zIndex: 9999,
-            background: '#4A90E2',
+            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
             color: '#fff',
             border: 'none',
-            borderRadius: 6,
-            padding: '8px 16px',
+            borderRadius: 8,
+            padding: '10px 16px',
             fontSize: 13,
             fontWeight: 600,
             cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
           }}
         >
-          AI Response
+          AI Content
         </button>
       )}
       {showDemo
         ? <AiContentDemo onClose={() => setShowDemo(false)} />
-        : <SlideBuilder />
+        : <AppLayout />
       }
     </>
   );

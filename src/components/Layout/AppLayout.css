@@ -1,0 +1,138 @@
+/* Theme Variables */
+.app-layout.dark {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #1e1e32;
+  --bg-tertiary: #16162a;
+  --header-bg: #1a1a2e;
+  --canvas-bg: #2d2d44;
+  --canvas-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --canvas-border: #1a1a1a;
+  --border-color: #2d2d44;
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-muted: #a0a0b0;
+  --input-bg: #2d2d44;
+  --btn-bg: #2d2d44;
+  --hover-bg: #3d3d5c;
+  --dropdown-bg: #252540;
+  --modal-bg: #1e1e32;
+  --code-bg: #16162a;
+  --panel-bg: #1e1e32;
+}
+
+.app-layout.light {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --header-bg: #ffffff;
+  --canvas-bg: #e2e8f0;
+  --canvas-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --canvas-border: #d1d5db;
+  --border-color: #e2e8f0;
+  --text-primary: #1e293b;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --input-bg: #f1f5f9;
+  --btn-bg: #f1f5f9;
+  --hover-bg: #e2e8f0;
+  --dropdown-bg: #ffffff;
+  --modal-bg: #ffffff;
+  --code-bg: #f8fafc;
+  --panel-bg: #ffffff;
+}
+
+.app-layout {
+  display: grid;
+  grid-template-rows: 48px 1fr;
+  grid-template-columns: 160px 48px 220px 1fr 280px;
+  grid-template-areas:
+    "header header header header header"
+    "slides icons  left   canvas right";
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+}
+
+.app-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 18px;
+}
+
+/* Slide Panel Area (Left-most) */
+.slide-panel-area {
+  grid-area: slides;
+  background-color: var(--bg-tertiary);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+}
+
+/* Icon Toolbar Area */
+.icon-toolbar-area {
+  grid-area: icons;
+  background-color: var(--bg-primary);
+  border-right: 1px solid var(--border-color);
+}
+
+/* Left Panel Area */
+.left-panel-area {
+  grid-area: left;
+  background-color: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+}
+
+/* Canvas Area */
+.canvas-area {
+  grid-area: canvas;
+  background-color: var(--canvas-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.canvas-container {
+  transform-origin: center center;
+  transition: transform 0.2s ease;
+}
+
+/* Right Panel Area */
+.right-panel-area {
+  grid-area: right;
+  background-color: var(--bg-secondary);
+  border-left: 1px solid var(--border-color);
+  overflow-y: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .app-layout {
+    grid-template-columns: 140px 48px 180px 1fr 260px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .app-layout {
+    grid-template-columns: 120px 48px 160px 1fr 240px;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-layout {
+    grid-template-columns: 100px 48px 1fr 200px;
+    grid-template-areas:
+      "header header header header"
+      "slides icons  canvas right";
+  }
+
+  .left-panel-area {
+    display: none;
+  }
+}

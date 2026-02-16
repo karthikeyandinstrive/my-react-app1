@@ -9,7 +9,7 @@ interface ShapeElementProps {
 }
 
 function ShapeElement({ element, isSelected }: ShapeElementProps) {
-  const { actions } = usePresentation();
+  const { actions: _actions } = usePresentation();
 
   const renderShape = () => {
     const commonStyle = {

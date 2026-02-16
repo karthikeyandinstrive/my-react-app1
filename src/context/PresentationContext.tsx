@@ -1,13 +1,14 @@
-import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { PresentationState, Presentation, Slide, SlideElement } from '../types/presentation';
 import { apiService } from '../services/api';
-import { DEFAULT_SLIDE_WIDTH, DEFAULT_SLIDE_HEIGHT, DEFAULT_SLIDE_BACKGROUND, DEFAULT_TEXT_ELEMENT } from '../utils/constants';
+import { DEFAULT_SLIDE_WIDTH, DEFAULT_SLIDE_HEIGHT, DEFAULT_SLIDE_BACKGROUND } from '../utils/constants';
 
 type Action =
   | { type: 'SET_PRESENTATION'; payload: Presentation }
   | { type: 'CREATE_NEW_PRESENTATION'; payload: string }
   | { type: 'ADD_SLIDE' }
+  | { type: 'ADD_SLIDE_WITH_TEMPLATE'; payload: { elements: SlideElement[]; background: string; masterName: string } }
   | { type: 'DUPLICATE_SLIDE'; payload: string }
   | { type: 'DELETE_SLIDE'; payload: string }
   | { type: 'UPDATE_SLIDE'; payload: Slide }
@@ -31,6 +32,7 @@ interface PresentationContextType {
   actions: {
     createNewPresentation: (title: string) => void;
     addSlide: () => void;
+    addSlideWithTemplate: (elements: SlideElement[], background: string, masterName: string) => void;
     duplicateSlide: (id: string) => void;
     deleteSlide: (id: string) => void;
     updateSlide: (slide: Slide) => void;
@@ -106,6 +108,29 @@ function presentationReducer(state: PresentationState, action: Action): Presenta
         order: state.presentation.slides.length,
         elements: [],
         background: DEFAULT_SLIDE_BACKGROUND,
+      };
+
+      return {
+        ...state,
+        presentation: {
+          ...state.presentation,
+          slides: [...state.presentation.slides, newSlide],
+          updatedAt: new Date().toISOString(),
+        },
+        currentSlideIndex: state.presentation.slides.length,
+      };
+    }
+
+    case 'ADD_SLIDE_WITH_TEMPLATE': {
+      if (!state.presentation) return state;
+
+      const { elements, background, masterName } = action.payload;
+      const newSlide: Slide = {
+        id: uuidv4(),
+        order: state.presentation.slides.length,
+        elements: elements,
+        background: background,
+        masterName: masterName,
       };
 
       return {
@@ -467,6 +492,10 @@ export function PresentationProvider({ children }: { children: ReactNode }) {
 
     addSlide: () => {
       dispatch({ type: 'ADD_SLIDE' });
+    },
+
+    addSlideWithTemplate: (elements: SlideElement[], background: string, masterName: string) => {
+      dispatch({ type: 'ADD_SLIDE_WITH_TEMPLATE', payload: { elements, background, masterName } });
     },
 
     duplicateSlide: (id: string) => {

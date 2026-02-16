@@ -22,8 +22,29 @@ function SlideCanvas() {
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
+    // Don't handle shortcuts when typing in input fields
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+      return;
+    }
+
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const modifierKey = isMac ? e.metaKey : e.ctrlKey;
+
+    // Delete element
     if (e.key === 'Delete' && state.selectedElementId) {
       actions.deleteElement(state.selectedElementId);
+    }
+
+    // Copy element (Ctrl+C / Cmd+C)
+    if (modifierKey && e.key === 'c' && state.selectedElementId) {
+      e.preventDefault();
+      actions.copyElement(state.selectedElementId);
+    }
+
+    // Paste element (Ctrl+V / Cmd+V)
+    if (modifierKey && e.key === 'v' && state.copiedElement) {
+      e.preventDefault();
+      actions.pasteElement();
     }
   };
 
@@ -31,7 +52,7 @@ function SlideCanvas() {
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [state.selectedElementId]);
+  }, [state.selectedElementId, state.copiedElement]);
 
   return (
     <div className="slide-canvas-container">

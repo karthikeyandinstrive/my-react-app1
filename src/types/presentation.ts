@@ -1,4 +1,5 @@
 // Core type definitions for the presentation builder
+// Updated: force cache bust
 
 export type ElementType = 'text' | 'image' | 'shape' | 'table' | 'chart';
 
@@ -103,18 +104,74 @@ export interface ChartElement extends BaseElement {
 
 export type SlideElement = TextElement | ImageElement | ShapeElement | TableElement | ChartElement;
 
+// Placeholder types for Slide Masters
+export type PlaceholderType = 'title' | 'subtitle' | 'body' | 'content' | 'image' | 'chart' | 'table' | 'footer' | 'date' | 'slideNumber';
+
+export interface Placeholder {
+  name: string;
+  type: PlaceholderType;
+  position: Position;
+  defaultText?: string;
+  defaultStyle?: Partial<TextElement>;
+}
+
+// Slide Master object types
+export interface MasterObject {
+  type: 'text' | 'image' | 'shape' | 'line' | 'rect' | 'placeholder';
+  options: {
+    x: number | string;  // number (%) or 'n%'
+    y: number | string;
+    w?: number | string;
+    h?: number | string;
+    text?: string;
+    color?: string;
+    fill?: string;
+    fontSize?: number;
+    fontFamily?: string;
+    bold?: boolean;
+    align?: 'left' | 'center' | 'right';
+    valign?: 'top' | 'middle' | 'bottom';
+    line?: { color: string; width: number };
+    path?: string;  // for images
+    // Placeholder specific
+    name?: string;
+    placeholderType?: PlaceholderType;
+  };
+}
+
+// Slide Master definition
+export interface SlideMaster {
+  id: string;
+  title: string;
+  displayName: string;
+  background: {
+    color?: string;
+    image?: string;
+  };
+  objects: MasterObject[];
+  placeholders: Placeholder[];
+  slideNumber?: {
+    x: number | string;
+    y: number | string;
+    color?: string;
+    fontSize?: number;
+  };
+}
+
 export interface Slide {
   id: string;
   order: number;
   elements: SlideElement[];
   background: string;    // Color (hex) or image URL
   thumbnail?: string;    // Generated preview (optional)
+  masterName?: string;   // Reference to SlideMaster title
 }
 
 export interface Presentation {
   id: string;
   title: string;
   slides: Slide[];
+  slideMasters?: SlideMaster[];  // Custom slide masters
   createdAt: string;
   updatedAt: string;
   metadata: {

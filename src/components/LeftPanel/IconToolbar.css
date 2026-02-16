@@ -1,0 +1,58 @@
+.icon-toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  gap: 4px;
+}
+
+.icon-tool-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.icon-tool-btn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 0 2px 2px 0;
+  transition: height 0.2s;
+}
+
+.icon-tool-btn:hover {
+  background-color: var(--hover-bg, #2d2d44);
+}
+
+.icon-tool-btn.active {
+  background-color: var(--hover-bg, #2d2d44);
+}
+
+.icon-tool-btn.active::before {
+  height: 24px;
+}
+
+.icon-tool-icon {
+  font-size: 18px;
+  color: var(--text-muted, #a0a0b0);
+  font-weight: 600;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.icon-tool-btn:hover .icon-tool-icon,
+.icon-tool-btn.active .icon-tool-icon {
+  color: var(--text-primary, #fff);
+}

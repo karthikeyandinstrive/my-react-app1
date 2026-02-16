@@ -3,7 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #292929;
+  background: var(--canvas-bg, #292929);
   padding: 40px 20px;
   overflow: auto;
 }
@@ -13,8 +13,8 @@
   width: 960px;
   height: 540px;
   background: white;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  border: 1px solid #1a1a1a;
+  box-shadow: var(--canvas-shadow, 0 8px 24px rgba(0, 0, 0, 0.4));
+  border: 1px solid var(--canvas-border, #1a1a1a);
   overflow: hidden;
 }
 

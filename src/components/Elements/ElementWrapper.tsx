@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect, ReactNode } from 'react';
+import { useState, useRef, useEffect, type ReactNode } from 'react';
 import { usePresentation } from '../../context/PresentationContext';
-import type { SlideElement, Position } from '../../types/presentation';
+import type { SlideElement } from '../../types/presentation';
 import './ElementWrapper.css';
 
 interface ElementWrapperProps {
@@ -25,7 +25,8 @@ function ElementWrapper({ element, isSelected, children }: ElementWrapperProps) 
     const canvasElement = elementRef.current?.parentElement;
     if (!canvasElement) return;
 
-    const canvasRect = canvasElement.getBoundingClientRect();
+    // Store canvas rect for bounds checking
+    canvasElement.getBoundingClientRect();
 
     dragStartPos.current = {
       x: e.clientX,

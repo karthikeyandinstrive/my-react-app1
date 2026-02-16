@@ -1,8 +1,11 @@
 import pptxgen from 'pptxgenjs';
 import type { Presentation, Slide, SlideElement, TextElement, ImageElement, ShapeElement, TableElement, ChartElement } from '../types/presentation';
+import { DEFAULT_SLIDE_MASTERS } from '../utils/slideTemplates';
 
 export class PPTXGenerator {
   private pres: pptxgen;
+  private slideWidth: number = 10;
+  private slideHeight: number = 7.5;
 
   constructor(presentation: Presentation) {
     this.pres = new pptxgen();
@@ -16,6 +19,8 @@ export class PPTXGenerator {
 
     // Set custom slide dimensions if specified
     if (presentation.metadata.slideWidth && presentation.metadata.slideHeight) {
+      this.slideWidth = presentation.metadata.slideWidth;
+      this.slideHeight = presentation.metadata.slideHeight;
       this.pres.defineLayout({
         name: 'CUSTOM',
         width: presentation.metadata.slideWidth,
@@ -24,17 +29,62 @@ export class PPTXGenerator {
       this.pres.layout = 'CUSTOM';
     }
 
+    // Define slide masters from templates
+    this.defineSlideMasters();
+
     // Add all slides in order
     presentation.slides
       .sort((a, b) => a.order - b.order)
       .forEach(slide => this.addSlide(slide, presentation.metadata.slideWidth, presentation.metadata.slideHeight));
   }
 
-  private addSlide(slide: Slide, slideWidth: number, slideHeight: number): void {
-    const pptxSlide = this.pres.addSlide();
+  private defineSlideMasters(): void {
+    // Define each slide master from our templates
+    DEFAULT_SLIDE_MASTERS.forEach(master => {
+      const masterObjects: any[] = [];
 
-    // Set background
-    if (slide.background) {
+      // Convert our master objects to PptxGenJS format
+      master.objects.forEach(obj => {
+        if (obj.type === 'rect') {
+          const x = typeof obj.options.x === 'string' ? parseFloat(obj.options.x) / 100 * this.slideWidth : (obj.options.x / 100) * this.slideWidth;
+          const y = typeof obj.options.y === 'string' ? parseFloat(obj.options.y) / 100 * this.slideHeight : (obj.options.y / 100) * this.slideHeight;
+          const w = obj.options.w ? (typeof obj.options.w === 'string' ? parseFloat(obj.options.w) / 100 * this.slideWidth : (obj.options.w as number / 100) * this.slideWidth) : this.slideWidth;
+          const h = obj.options.h ? (typeof obj.options.h === 'string' ? parseFloat(obj.options.h) / 100 * this.slideHeight : (obj.options.h as number / 100) * this.slideHeight) : 1;
+
+          masterObjects.push({
+            rect: {
+              x, y, w, h,
+              fill: { color: obj.options.fill?.replace('#', '') || 'FFFFFF' },
+            },
+          });
+        }
+      });
+
+      // Define the slide master
+      try {
+        this.pres.defineSlideMaster({
+          title: master.title,
+          background: { color: master.background.color?.replace('#', '') || 'FFFFFF' },
+          objects: masterObjects,
+        });
+      } catch (e) {
+        // Master already defined or error, skip
+        console.warn(`Could not define master ${master.title}:`, e);
+      }
+    });
+  }
+
+  private addSlide(slide: Slide, slideWidth: number, slideHeight: number): void {
+    // Create slide with master if specified
+    const slideOptions: any = {};
+    if (slide.masterName) {
+      slideOptions.masterName = slide.masterName;
+    }
+
+    const pptxSlide = this.pres.addSlide(slideOptions);
+
+    // Set background (only if not using a master, or overriding)
+    if (slide.background && !slide.masterName) {
       if (slide.background.startsWith('#')) {
         pptxSlide.background = { color: slide.background.replace('#', '') };
       } else if (slide.background.startsWith('http') || slide.background.startsWith('data:')) {

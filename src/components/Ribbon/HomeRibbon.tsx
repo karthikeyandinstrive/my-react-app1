@@ -1,19 +1,29 @@
 import { useState } from 'react';
 import { usePresentation } from '../../context/PresentationContext';
 import { v4 as uuidv4 } from 'uuid';
-import type { TextElement, ImageElement, ShapeElement, TableElement, ChartElement, TableCell, ChartType } from '../../types/presentation';
+import type { TextElement, ImageElement, ShapeElement, TableElement, ChartElement, TableCell, ChartType, SlideMaster } from '../../types/presentation';
 import { DEFAULT_TEXT_ELEMENT, DEFAULT_SHAPE_ELEMENT, DEFAULT_TABLE_ELEMENT, DEFAULT_TABLE_CELL, DEFAULT_CHART_ELEMENT, SAMPLE_CHART_DATA } from '../../utils/constants';
 import { generateAndDownloadPPTX } from '../../services/pptxGenerator';
+import { createElementsFromMaster, getMasterBackground } from '../../utils/slideTemplates';
 import ChartTypeSelector from '../Elements/ChartTypeSelector';
+import TemplateSelector from '../Templates/TemplateSelector';
 import ReactJson from 'react-json-view';
 import './Ribbon.css';
 
 function HomeRibbon() {
   const { state, actions } = usePresentation();
   const [showChartSelector, setShowChartSelector] = useState(false);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
   const handleAddSlide = () => {
-    actions.addSlide();
+    setShowTemplateSelector(true);
+  };
+
+  const handleTemplateSelect = (master: SlideMaster) => {
+    const elements = createElementsFromMaster(master);
+    const background = getMasterBackground(master);
+    actions.addSlideWithTemplate(elements, background, master.title);
+    setShowTemplateSelector(false);
   };
 
   const handleDeleteSlide = () => {
@@ -239,6 +249,13 @@ function HomeRibbon() {
       <ChartTypeSelector
         onSelect={handleChartTypeSelect}
         onClose={() => setShowChartSelector(false)}
+      />
+    )}
+
+    {showTemplateSelector && (
+      <TemplateSelector
+        onSelect={handleTemplateSelect}
+        onClose={() => setShowTemplateSelector(false)}
       />
     )}
 
