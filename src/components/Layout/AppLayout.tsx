@@ -14,7 +14,7 @@ export type ToolType = 'text' | 'shapes' | 'tables' | 'charts' | 'images';
 export type ThemeType = 'dark' | 'light';
 
 function AppLayout() {
-  const { state } = usePresentation();
+  const { state, actions } = usePresentation();
   const [activeTool, setActiveTool] = useState<ToolType | null>('text');
   const [zoom, setZoom] = useState(100);
   const [theme, setTheme] = useState<ThemeType>(() => {
@@ -43,6 +43,11 @@ function AppLayout() {
     setActiveTool(null);
   };
 
+  const handleToolChange = (tool: ToolType) => {
+    setActiveTool(tool);
+    actions.deselectAll(); // Close right panel when opening left panel
+  };
+
   const showLeftPanel = activeTool !== null;
   const showRightPanel = state.selectedElementId !== null || state.isSlideSelected;
 
@@ -69,7 +74,7 @@ function AppLayout() {
       </div>
 
       <div className="icon-toolbar-area">
-        <IconToolbar activeTool={activeTool} onToolChange={setActiveTool} />
+        <IconToolbar activeTool={activeTool} onToolChange={handleToolChange} />
       </div>
 
       {activeTool && (
